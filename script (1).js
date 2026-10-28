@@ -18,12 +18,49 @@ if (boton && menu) {
 
 const navMovil = document.querySelector(".nav-movil");
 if (navMovil) {
-  navMovil.querySelectorAll("a").forEach((enlace) => {
+  const enlacesNavMovil = Array.from(navMovil.querySelectorAll("a"));
+  const idsSecciones = ["inicio", "productos", "historia", "contacto"];
+
+  function actualizarNavMovilActivo() {
+    const puntoReferencia = window.innerHeight * 0.38;
+    let idActivo = "inicio";
+
+    idsSecciones.forEach((id) => {
+      const seccion = document.getElementById(id);
+      if (!seccion) return;
+
+      const rect = seccion.getBoundingClientRect();
+      if (rect.top <= puntoReferencia && rect.bottom >= puntoReferencia) {
+        idActivo = id;
+      }
+    });
+
+    enlacesNavMovil.forEach((enlace) => {
+      const href = enlace.getAttribute("href");
+      const activo = href === `#${idActivo}`;
+      enlace.classList.toggle("activo", activo);
+      if (activo) {
+        enlace.setAttribute("aria-current", "page");
+      } else {
+        enlace.removeAttribute("aria-current");
+      }
+    });
+  }
+
+  enlacesNavMovil.forEach((enlace) => {
     enlace.addEventListener("click", () => {
-      navMovil.querySelectorAll("a").forEach((item) => item.classList.remove("activo"));
+      enlacesNavMovil.forEach((item) => {
+        item.classList.remove("activo");
+        item.removeAttribute("aria-current");
+      });
       enlace.classList.add("activo");
+      enlace.setAttribute("aria-current", "page");
     });
   });
+
+  actualizarNavMovilActivo();
+  window.addEventListener("scroll", actualizarNavMovilActivo, { passive: true });
+  window.addEventListener("load", actualizarNavMovilActivo);
 }
 
 // Modal de producto
